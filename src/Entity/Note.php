@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -53,15 +52,21 @@ class Note
     #[ORM\JoinColumn(nullable: true)]
     private ?User $creator = null;
 
+    /**
+     * @var Collection<int, Like>
+     */
+    #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'note', orphanRemoval: true)]
+    private Collection $likes;
 
 
-    public function __construct(private SluggerInterface $slugger)
+
+    public function __construct()
     {
         $this->notifications = new ArrayCollection(); // Here its the array collection of notifications.
         $this->setPublic(false); // as we kept our is_public cant be null and at the intitial stage we can set it to false;
         // $this->title = 'new title -' . $this->getId(); // Just to get  a unique title for our note.
         $this->title = uniqid('note-'); // Just to get  a unique title for our note.
-        $this->slug = $slugger->slug($this->getTitle());
+        $this->likes = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -216,6 +221,36 @@ class Note
     public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Like>
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Like $like): static
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setNote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Like $like): static
+    {
+        if ($this->likes->removeElement($like)) {
+            // set the owning side to null (unless already changed)
+            if ($like->getNote() === $this) {
+                $like->setNote(null);
+            }
+        }
 
         return $this;
     }

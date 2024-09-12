@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block body %}
+{% include "components/navbar.html.twig" %}
+
+<h1 class="text-5xl text-green-500">Homepage</h1>
+
+
+
+<header>
+
+<h1>Lorem ipsum dolor, is odio dolorem m obcaecati quisquam, accusantium totam? Error, delectus iure.</h1>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima expedita, quidem aliquid nobis quod dolorem explicabo? Quidem eaque consectetur, illum ad consequatur temporibus. Ratione nam veritatis mollitia, quisquam blanditiis facere?</p>
+
+</header>
+<div>
+<h3>quod nobis mollitia in quam libero nihil aperiam. Doloremque?</h3
+>
+<p>there are {{lastNotes|length}}< public notes share on codeXpress</p>
+<div>
+{% for item in lastNotes %}
+<div>
+
+{{item.title}}
+{{item.category.title}}
+
+</div>
+
+ {% endfor %} 
+
+</div>
+
+</div>
+
+{% include "components/footer.html.twig" %}
+
+{% endblock %}
